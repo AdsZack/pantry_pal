@@ -1,19 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pantry_pal/features/search/data/recipe_repository_impl.dart';
-import 'package:pantry_pal/features/search/domain/recipe.dart';
 
+import '../data/recipe_repository_impl.dart';
+import '../domain/recipe.dart';
+
+/// Step 4: holds search state. AsyncValue = loading | data | error.
 class SearchNotifier extends AsyncNotifier<List<Recipe>> {
-  String _lasQuery = '';
+  String _lastQuery = '';
 
   @override
   Future<List<Recipe>> build() async => [];
 
   Future<void> search(String query) async {
     final q = query.trim();
-    _lasQuery = q;
+    _lastQuery = q;
 
-    // If Empty Query
-    if(q.isEmpty) {
+    // Empty query: reset, don't call the API
+    if (q.isEmpty) {
       state = AsyncData(<Recipe>[]);
       return;
     }
@@ -23,13 +25,13 @@ class SearchNotifier extends AsyncNotifier<List<Recipe>> {
       () => ref.read(recipeRepositoryProvider).search(q),
     );
 
-    // User may type something
-    if(q != _lasQuery) return;
+    // The user may have typed something newer while we waited: ignore stale result
+    if (q != _lastQuery) return;
     state = result;
   }
 
-  Future<void> retry() => search(_lasQuery);
+  Future<void> retry() => search(_lastQuery);
 }
 
-final searchProvider = 
-  AsyncNotifierProvider<SearchNotifier, List<Recipe>>(SearchNotifier.new);
+final searchProvider =
+    AsyncNotifierProvider<SearchNotifier, List<Recipe>>(SearchNotifier.new);

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pantry_pal/core/utils/debauncher.dart';
+import 'package:pantry_pal/core/widgets/message_view.dart';
 import 'package:pantry_pal/features/search/presentation/search_notifier.dart';
 import 'package:pantry_pal/features/search/presentation/widgets/recipe_card.dart';
 import 'package:pantry_pal/features/search/presentation/widgets/recipe_card_skeleton.dart';
@@ -60,7 +61,7 @@ class _ResultsPageState extends ConsumerState<ResultsPage> {
                 itemCount: 6,
                 padding: const EdgeInsets.all(16),
               ),
-              error: (error, stack) => _Message(
+              error: (error, stack) => MessageView(
                 icon: Icons.wifi_off,
                 text: 'Something went wrong',
                 action: FilledButton(
@@ -71,7 +72,7 @@ class _ResultsPageState extends ConsumerState<ResultsPage> {
               data: (recipes) {
                 if (recipes.isEmpty) {
                   final typed = _controller.text.trim().isNotEmpty;
-                  return _Message(
+                  return MessageView(
                     icon: typed ? Icons.search_off : Icons.restaurant_menu, 
                     text: typed ? 'No recipes found' : 'Type recipe name',
                   );
@@ -84,28 +85,6 @@ class _ResultsPageState extends ConsumerState<ResultsPage> {
               }
             )
           )
-        ],
-      ),
-    );
-  }
-}
-
-class _Message extends StatelessWidget {
-  const _Message({required this.icon, required this.text, this.action});
-
-  final IconData icon;
-  final String text;
-  final Widget? action;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          Icon(icon, size: 48),
-          const SizedBox(height: 12),
-          Text(text),
-          if (action != null) ...[const SizedBox(height: 16), action!],
         ],
       ),
     );
