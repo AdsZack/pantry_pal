@@ -5,6 +5,7 @@ import 'package:pantry_pal/core/widgets/message_view.dart';
 import 'package:pantry_pal/features/detail/presentation/detail_provider.dart';
 import 'package:pantry_pal/features/detail/presentation/widgets/ingredient_row.dart';
 import 'package:pantry_pal/features/detail/presentation/widgets/instruction_steps.dart';
+import 'package:pantry_pal/features/favorites/data/favorites_repository.dart';
 import 'package:pantry_pal/features/search/domain/recipe.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,7 +39,7 @@ class DetailPage extends ConsumerWidget {
   }
 }
 
-class _DetailContent extends StatelessWidget {
+class _DetailContent extends ConsumerWidget {
   const _DetailContent({required this.recipe});
 
   final Recipe recipe;
@@ -55,10 +56,12 @@ class _DetailContent extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
     final videoUrl = recipe.youtubeUrl;
+
+    final isFav = ref.watch(isFavoriteProvider(recipe.id)).value ?? false;
 
     return Scaffold(
       body: CustomScrollView(
@@ -68,9 +71,9 @@ class _DetailContent extends StatelessWidget {
             expandedHeight: 260,
             actions: [
               IconButton(
-                onPressed: (){}, 
-                tooltip: 'Save',
-                icon: Icon(Icons.favorite_border)
+                onPressed: () => ref.read(favoritesRepositoryProvider).toggle(recipe), 
+                tooltip: isFav ? 'Remove from favorite' : 'Save',
+                icon: Icon( isFav ? Icons.favorite : Icons.favorite_border)
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
